@@ -485,7 +485,7 @@
     <div class="chats-list" id="chatsList"></div>
     <div class="input-container">
         <div class="input-bar">
-            <input type="text" id="newChatUser" placeholder="👤 Имя для нового чата">
+            <input type="text" id="newChatUser" placeholder="👤 Имя пользователя для нового чата">
             <button id="createChatBtn" class="send-btn" style="background:#2b6fde;">+</button>
         </div>
     </div>
@@ -508,7 +508,7 @@
     </div>
     <div class="input-container">
         <div class="input-bar">
-            <input type="text" id="messageInput" placeholder="Сообщение...">
+            <input type="text" id="messageInput" placeholder="Введите сообщение...">
             <button id="sendBtn" class="send-btn">📤</button>
         </div>
     </div>
@@ -526,7 +526,6 @@
     let selectedMessage = null;
     let replyToMessage = null;
     let editingMessage = null;
-    let originalScrollHeight = 0;
 
     function getUsers() {
         let users = localStorage.getItem('gaga_users');
@@ -582,11 +581,10 @@
     function register(username, password) {
         let users = getUsers();
         if (users[username]) return false;
-        let privateChat = '📓 ' + username + ' (личное)';
         users[username] = {
             password: btoa(password),
-            chats: [privateChat],
-            favorites: [privateChat]
+            chats: [],
+            favorites: []
         };
         saveUsers(users);
         return true;
@@ -623,7 +621,10 @@
     }
     
     function createChatWith(otherUser) {
-        if (otherUser === currentUser) return true;
+        if (otherUser === currentUser) {
+            alert("Нельзя создать чат с самим собой!");
+            return false;
+        }
         let users = getUsers();
         if (!users[otherUser]) return false;
         let userData = users[currentUser];
@@ -651,6 +652,7 @@
         let container = document.getElementById('chatsList');
         if (!container) return;
         container.innerHTML = '';
+        
         if (favoriteChats.length > 0) {
             let favTitle = document.createElement('div');
             favTitle.style.cssText = 'padding: 12px 16px 4px 16px; color:#8e8e93; font-size:13px;';
@@ -670,21 +672,18 @@
             }
         }
         if (allChats.length === 0) {
-            container.innerHTML = '<div style="text-align:center;color:#8e8e93;padding:40px;">Нет чатов</div>';
+            container.innerHTML = '<div style="text-align:center;color:#8e8e93;padding:40px;">Нет чатов<br><br>➕ Добавьте пользователя в поле ниже</div>';
         }
     }
     
     function createChatItem(chatName, isFav) {
         let div = document.createElement('div');
         div.className = 'chat-item';
-        let isPrivate = chatName.includes('(личное)');
-        let displayName = isPrivate ? currentUser + ' (заметки)' : chatName;
-        let emoji = isPrivate ? '📓' : '👤';
         div.innerHTML = `
-            <div class="chat-avatar">${emoji}</div>
+            <div class="chat-avatar">👤</div>
             <div class="chat-preview">
-                <h4>${escapeHtml(displayName)}</h4>
-                <p>${isPrivate ? 'Личные заметки' : 'Нажмите для чата'}</p>
+                <h4>${escapeHtml(chatName)}</h4>
+                <p>Нажмите для чата</p>
             </div>
             <button class="star-btn" style="color:${isFav ? '#ffc107' : '#555'};">${isFav ? '★' : '☆'}</button>
         `;
@@ -715,14 +714,12 @@
         editingMessage = null;
         let replyBar = document.getElementById('replyBar');
         if (replyBar) replyBar.style.display = 'none';
-        let isPrivate = withUser.includes('(личное)');
-        let displayName = isPrivate ? currentUser + ' (заметки)' : withUser;
         let nameElem = document.getElementById('chatWithName');
-        if (nameElem) nameElem.innerText = displayName;
+        if (nameElem) nameElem.innerText = withUser;
         let avatarElem = document.getElementById('chatAvatar');
-        if (avatarElem) avatarElem.innerHTML = isPrivate ? '📓' : '👤';
+        if (avatarElem) avatarElem.innerHTML = '👤';
         let statusElem = document.getElementById('chatStatus');
-        if (statusElem) statusElem.innerText = isPrivate ? 'личные заметки' : 'онлайн';
+        if (statusElem) statusElem.innerText = 'онлайн';
         updateStarInChat();
         renderMessages();
         let chatsScreen = document.getElementById('chatsScreen');
@@ -730,11 +727,13 @@
         if (chatsScreen) chatsScreen.classList.add('hide');
         if (chatScreen) chatScreen.classList.remove('hide');
         
-        // Focus on input after opening chat
         setTimeout(() => {
             let input = document.getElementById('messageInput');
-            if (input) input.focus();
-        }, 100);
+            if (input) {
+                input.focus();
+                input.click();
+            }
+        }, 300);
     }
     
     function updateStarInChat() {
@@ -777,11 +776,9 @@
         let container = document.getElementById('messagesContainer');
         if (!container) return;
         
-        // Save scroll position
         let wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
         
         container.innerHTML = '';
-        let isPrivate = currentChatWith.includes('(личное)');
         for (let i = 0; i < messages.length; i++) {
             let msg = messages[i];
             let row = document.createElement('div');
@@ -812,16 +809,18 @@
             row.appendChild(bubble);
             container.appendChild(row);
         }
-        if (isPrivate && messages.length === 0) {
-            let note = document.createElement('div');
-            note.className = 'private-message';
-            note.innerHTML = '<div class="private-bubble">📝 Здесь будут ваши личные заметки</div>';
-            container.appendChild(note);
+        
+        if (messages.length === 0) {
+            let emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = 'text-align:center;color:#8e8e93;padding:40px;';
+            emptyDiv.innerHTML = '💬 Нет сообщений<br><br>Напишите что-нибудь...';
+            container.appendChild(emptyDiv);
         }
         
-        // Restore scroll position
-        if (wasAtBottom) {
-            container.scrollTop = container.scrollHeight;
+        if (wasAtBottom || messages.length === 0) {
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
         }
     }
     
@@ -829,7 +828,15 @@
         let input = document.getElementById('messageInput');
         if (!input) return;
         let text = input.value.trim();
-        if (!text) return;
+        if (!text) {
+            alert("Введите сообщение!");
+            return;
+        }
+        if (!currentChatWith) {
+            alert("Чат не выбран!");
+            return;
+        }
+        
         if (editingMessage) {
             editMessage(currentUser, currentChatWith, editingMessage.id, text);
             editingMessage = null;
@@ -843,15 +850,14 @@
         }
         renderMessages();
         input.value = '';
-        input.focus();
         
-        // Scroll to bottom
-        let container = document.getElementById('messagesContainer');
-        if (container) {
-            setTimeout(() => {
+        setTimeout(() => {
+            let container = document.getElementById('messagesContainer');
+            if (container) {
                 container.scrollTop = container.scrollHeight;
-            }, 50);
-        }
+            }
+            if (input) input.focus();
+        }, 50);
     }
     
     function showAuth() {
@@ -873,44 +879,36 @@
         if (chatScreen) chatScreen.classList.add('hide');
     }
     
-    // Handle keyboard visibility
-    function handleKeyboardShow() {
-        let container = document.getElementById('messagesContainer');
-        if (container) {
-            setTimeout(() => {
-                container.scrollTop = container.scrollHeight;
-            }, 100);
-        }
-    }
-    
-    // Focus and blur handlers
-    let messageInput = document.getElementById('messageInput');
-    if (messageInput) {
-        messageInput.addEventListener('focus', handleKeyboardShow);
-        messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
-    }
-    
-    // Elements initialization
+    // Initialize event listeners
     let loginBtn = document.getElementById('doLogin');
     if (loginBtn) {
         loginBtn.onclick = () => {
-            let user = document.getElementById('loginUsername').value;
+            let user = document.getElementById('loginUsername').value.trim();
             let pass = document.getElementById('loginPassword').value;
-            if (login(user, pass)) showChats();
-            else alert('Неверно');
+            if (user && pass && login(user, pass)) {
+                showChats();
+            } else {
+                alert("Неверное имя пользователя или пароль!");
+            }
         };
     }
     
     let registerBtn = document.getElementById('doRegister');
     if (registerBtn) {
         registerBtn.onclick = () => {
-            let user = document.getElementById('regUsername').value;
+            let user = document.getElementById('regUsername').value.trim();
             let pass = document.getElementById('regPassword').value;
-            if (register(user, pass)) {
-                alert('Успех! Войдите');
-                let toLogin = document.getElementById('toLogin');
-                if (toLogin) toLogin.click();
-            } else alert('Пользователь есть');
+            if (user && pass) {
+                if (register(user, pass)) {
+                    alert("Регистрация успешна! Теперь войдите.");
+                    let toLogin = document.getElementById('toLogin');
+                    if (toLogin) toLogin.click();
+                } else {
+                    alert("Пользователь с таким именем уже существует!");
+                }
+            } else {
+                alert("Заполните все поля!");
+            }
         };
     }
     
@@ -952,13 +950,18 @@
     let createChatBtn = document.getElementById('createChatBtn');
     if (createChatBtn) {
         createChatBtn.onclick = () => {
-            let other = document.getElementById('newChatUser').value;
+            let other = document.getElementById('newChatUser').value.trim();
+            if (!other) {
+                alert("Введите имя пользователя!");
+                return;
+            }
             if (createChatWith(other)) { 
                 renderChats(); 
                 let input = document.getElementById('newChatUser');
                 if (input) input.value = '';
-            } else if (other !== currentUser) {
-                alert('Пользователь не найден');
+                alert(`Чат с ${other} создан!`);
+            } else {
+                alert(`Пользователь "${other}" не найден!`);
             }
         };
     }
@@ -968,6 +971,19 @@
         sendBtn.onclick = sendMessage;
     }
     
+    let messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.onkeypress = (e) => { 
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
+        messageInput.onclick = (e) => {
+            e.stopPropagation();
+        };
+    }
+    
     let replyMenuItem = document.getElementById('replyMenuItem');
     if (replyMenuItem) {
         replyMenuItem.onclick = () => {
@@ -975,7 +991,7 @@
                 replyToMessage = selectedMessage;
                 let replyText = document.getElementById('replyText');
                 if (replyText) {
-                    replyText.innerHTML = `✏️ Ответ ${selectedMessage.from}: ${selectedMessage.text.substring(0, 40)}`;
+                    replyText.innerHTML = `↩️ Ответ ${selectedMessage.from}: ${selectedMessage.text.substring(0, 40)}`;
                 }
                 let replyBar = document.getElementById('replyBar');
                 if (replyBar) replyBar.style.display = 'flex';
@@ -998,13 +1014,13 @@
                 if (replyBar) {
                     replyBar.style.display = 'flex';
                     let replyText = document.getElementById('replyText');
-                    if (replyText) replyText.innerHTML = `✏️ Редактирование`;
+                    if (replyText) replyText.innerHTML = `✏️ Редактирование сообщения`;
                 }
                 let menu = document.getElementById('messageMenu');
                 if (menu) menu.style.display = 'none';
                 if (input) input.focus();
             } else {
-                alert('Можно редактировать только свои сообщения');
+                alert("Можно редактировать только свои сообщения!");
             }
         };
     }
@@ -1013,10 +1029,12 @@
     if (deleteMenuItem) {
         deleteMenuItem.onclick = () => {
             if (selectedMessage && selectedMessage.from === currentUser) {
-                deleteMessage(currentUser, currentChatWith, selectedMessage.id);
-                renderMessages();
+                if (confirm("Удалить сообщение?")) {
+                    deleteMessage(currentUser, currentChatWith, selectedMessage.id);
+                    renderMessages();
+                }
             } else {
-                alert('Можно удалять только свои сообщения');
+                alert("Можно удалять только свои сообщения!");
             }
             let menu = document.getElementById('messageMenu');
             if (menu) menu.style.display = 'none';
@@ -1032,6 +1050,7 @@
             if (replyBar) replyBar.style.display = 'none';
             let input = document.getElementById('messageInput');
             if (input) input.value = '';
+            if (input) input.focus();
         };
     }
     
@@ -1040,6 +1059,7 @@
         register('Alice', '123');
         register('Bob', '123');
         register('Charlie', '123');
+        console.log("Test users created: Alice, Bob, Charlie (password: 123)");
     }
     showAuth();
 </script>
