@@ -2,115 +2,195 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>DevStudio | Современная веб-разработка</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Gaga_Chat | Premium Design</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0f;
-            color: #ffffff;
-            scroll-behavior: smooth;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #0f0f1a;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
 
-        /* Анимированный градиентный фон */
-        .gradient-bg {
+        /* Анимированный фон */
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle at 20% 50%, #1a1a2e, #0a0a0f);
-        }
-
-        .gradient-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(125deg, rgba(100, 108, 255, 0.1) 0%, rgba(255, 80, 120, 0.05) 100%);
+            background: radial-gradient(circle at 20% 50%, #1a1a3e, #0a0a15);
             z-index: -1;
         }
 
-        /* Стеклянная шапка */
-        .navbar {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(15, 15, 25, 0.8);
-            backdrop-filter: blur(12px);
-            border-radius: 60px;
-            padding: 12px 32px;
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100,108,255,0.08) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .app-container {
+            height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            border: 1px solid rgba(100, 108, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #646cff, #ff5078);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            margin-left: 30px;
-            color: #a0a0b0;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #646cff;
-        }
-
-        /* Hero секция */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            flex-direction: column;
+            background: rgba(15, 15, 26, 0.7);
+            backdrop-filter: blur(10px);
             position: relative;
         }
 
-        .hero-content h1 {
-            font-size: 64px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff, #646cff, #ff5078);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 24px;
-            animation: fadeIn 1s ease;
+        /* Премиум шапка */
+        .tg-header {
+            background: rgba(20, 20, 35, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(100, 108, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-shrink: 0;
         }
 
-        .hero-content p {
-            font-size: 20px;
-            color: #a0a0b0;
-            margin-bottom: 40px;
-            animation: fadeIn 1s ease 0.2s backwards;
+        .back-btn, .menu-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
-        @keyframes fadeIn {
+        .back-btn:active, .menu-btn:active {
+            background: rgba(100,108,255,0.3);
+            transform: scale(0.95);
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #646cff, #ff5078);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(100,108,255,0.3);
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.3px;
+        }
+
+        .chat-status {
+            font-size: 13px;
+            color: #44ff88;
+            opacity: 0.9;
+        }
+
+        /* Список чатов */
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+            background: transparent;
+        }
+
+        .chat-item:active {
+            background: rgba(100,108,255,0.1);
+        }
+
+        .chat-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #646cff, #ff5078);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .chat-preview {
+            flex: 1;
+        }
+
+        .chat-preview h4 {
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .chat-preview p {
+            font-size: 13px;
+            color: #8e8ea8;
+        }
+
+        /* Окно сообщений */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+            animation: messageSlide 0.2s ease;
+        }
+
+        @keyframes messageSlide {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -118,240 +198,719 @@
             }
         }
 
-        .btn-glow {
-            background: linear-gradient(135deg, #646cff, #ff5078);
-            padding: 14px 40px;
-            border-radius: 60px;
-            font-weight: 600;
+        .message-row.outgoing {
+            justify-content: flex-end;
+        }
+
+        .message-row.incoming {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .bubble:active {
+            transform: scale(0.98);
+        }
+
+        .outgoing .bubble {
+            background: linear-gradient(135deg, #646cff, #7c5cff);
             color: white;
-            text-decoration: none;
-            transition: 0.3s;
-            display: inline-block;
-            box-shadow: 0 0 20px rgba(100, 108, 255, 0.4);
-            animation: fadeIn 1s ease 0.4s backwards;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(100,108,255,0.3);
         }
 
-        .btn-glow:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(100, 108, 255, 0.6);
-        }
-
-        /* Карточки */
-        .services {
-            padding: 100px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .services h2 {
-            font-size: 42px;
-            margin-bottom: 60px;
-            background: linear-gradient(135deg, #fff, #646cff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-        }
-
-        .card {
-            background: rgba(20, 20, 35, 0.6);
+        .incoming .bubble {
+            background: rgba(40, 40, 55, 0.9);
             backdrop-filter: blur(10px);
-            border-radius: 32px;
-            padding: 40px 30px;
-            width: 280px;
-            transition: 0.4s;
-            border: 1px solid rgba(100, 108, 255, 0.2);
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+            border: 0.5px solid rgba(255,255,255,0.05);
         }
 
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: #646cff;
-            box-shadow: 0 20px 40px rgba(100, 108, 255, 0.2);
+        .reply-preview {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-left: 2px solid rgba(255,255,255,0.4);
+            padding-left: 8px;
         }
 
-        .card h3 {
-            font-size: 24px;
-            margin: 20px 0 15px;
+        .bubble-text {
+            font-size: 15px;
+            line-height: 1.4;
         }
 
-        .card p {
-            color: #a0a0b0;
+        .edited-badge {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-left: 4px;
         }
 
-        /* Цена */
-        .pricing {
-            padding: 80px 20px;
-            text-align: center;
+        .bubble-time {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 4px;
+            text-align: right;
         }
 
-        .price-card {
-            background: linear-gradient(135deg, rgba(100, 108, 255, 0.1), rgba(255, 80, 120, 0.05));
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 40px;
-            border-radius: 48px;
-            border: 1px solid rgba(100, 108, 255, 0.3);
+        /* Меню сообщения */
+        .message-menu {
+            position: fixed;
+            background: rgba(30, 30, 45, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 200;
+            display: none;
+            border: 0.5px solid rgba(100,108,255,0.3);
+            min-width: 160px;
         }
 
-        .price {
-            font-size: 56px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #646cff, #ff5078);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin: 20px 0;
-        }
-
-        /* Форма */
-        .form-section {
-            padding: 100px 20px;
-            text-align: center;
-        }
-
-        .form-card {
-            max-width: 500px;
-            margin: 0 auto;
-            background: rgba(20, 20, 35, 0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 50px;
-            border: 1px solid rgba(100, 108, 255, 0.3);
-        }
-
-        .form-section h2 {
-            margin-bottom: 30px;
-            font-size: 36px;
-        }
-
-        input, textarea {
+        .message-menu button {
+            background: none;
+            border: none;
+            padding: 12px 18px;
+            color: white;
+            font-size: 15px;
             width: 100%;
-            padding: 16px;
-            margin: 12px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(100, 108, 255, 0.3);
-            border-radius: 24px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message-menu button:active {
+            background: rgba(100,108,255,0.2);
+        }
+
+        /* Панель ответа */
+        .reply-bar {
+            background: rgba(30, 30, 45, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(100,108,255,0.2);
+            flex-shrink: 0;
+        }
+
+        .reply-bar span {
+            flex: 1;
+            font-size: 13px;
+            color: #b0b0d0;
+        }
+
+        .reply-bar button {
+            background: none;
+            border: none;
+            color: #646cff;
+            font-size: 18px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Поле ввода */
+        .input-bar {
+            background: rgba(30, 30, 45, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-top: 0.5px solid rgba(100,108,255,0.2);
+            flex-shrink: 0;
+        }
+
+        .input-bar input {
+            flex: 1;
+            background: rgba(45, 45, 60, 0.8);
+            border: none;
+            padding: 12px 18px;
+            border-radius: 28px;
             color: white;
             font-size: 16px;
             outline: none;
+            transition: all 0.2s;
         }
 
-        input:focus, textarea:focus {
-            border-color: #646cff;
+        .input-bar input:focus {
+            background: rgba(55, 55, 75, 0.9);
+            box-shadow: 0 0 0 2px rgba(100,108,255,0.3);
         }
 
-        button {
-            background: linear-gradient(135deg, #646cff, #ff5078);
-            padding: 16px 40px;
+        .send-btn {
+            background: linear-gradient(135deg, #646cff, #7c5cff);
             border: none;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(100,108,255,0.3);
         }
 
-        button:hover {
-            transform: scale(1.02);
+        .send-btn:active {
+            transform: scale(0.93);
         }
 
-        footer {
-            background: rgba(10, 10, 15, 0.9);
+        /* Экран авторизации */
+        .auth-screen {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-card {
+            background: rgba(25, 25, 40, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px 28px;
+            width: 100%;
+            max-width: 340px;
+            border: 0.5px solid rgba(100,108,255,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .auth-card h2 {
             text-align: center;
-            padding: 40px;
-            color: #606070;
+            margin-bottom: 28px;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #646cff, #ff5078);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 12px;
-                border-radius: 30px;
-            }
-            .hero h1 {
-                font-size: 36px;
-            }
-            .card {
-                width: 100%;
-            }
+        .auth-card input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(45, 45, 60, 0.8);
+            border: 1px solid rgba(100,108,255,0.2);
+            border-radius: 24px;
+            color: white;
+            margin-bottom: 14px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .auth-card input:focus {
+            border-color: #646cff;
+            background: rgba(55, 55, 75, 0.9);
+        }
+
+        .auth-card button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #646cff, #7c5cff);
+            border: none;
+            border-radius: 28px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-card button:active {
+            transform: scale(0.97);
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 18px;
+            color: #8e8ea8;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .switch-link span {
+            color: #646cff;
+            font-weight: 600;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #646cff;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div class="gradient-bg"></div>
+<div class="animated-bg"></div>
 
-    <div class="navbar">
-        <div class="logo">✦ DEVSTUDIO</div>
-        <div class="nav-links">
-            <a href="#">Услуги</a>
-            <a href="#">Портфолио</a>
-            <a href="#form">Контакты</a>
-        </div>
+<div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+        <h2>✨ Gaga_Chat</h2>
+        <input type="text" id="loginUsername" placeholder="Имя пользователя">
+        <input type="password" id="loginPassword" placeholder="Пароль">
+        <button id="doLogin">Войти</button>
+        <div class="switch-link" id="toRegister">Нет аккаунта? <span>Создать</span></div>
     </div>
+    <div class="auth-card hide" id="registerCard">
+        <h2>📝 Регистрация</h2>
+        <input type="text" id="regUsername" placeholder="Имя пользователя">
+        <input type="password" id="regPassword" placeholder="Пароль">
+        <button id="doRegister">Создать аккаунт</button>
+        <div class="switch-link" id="toLogin"><span>Войти</span> в аккаунт</div>
+    </div>
+</div>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Создаю сайты,<br>которые работают</h1>
-            <p>Современный дизайн, скорость и надёжность</p>
-            <a href="#form" class="btn-glow">Заказать сайт →</a>
+<div id="chatsScreen" class="hide app-container">
+    <div class="tg-header">
+        <div class="avatar">👤</div>
+        <div class="chat-info">
+            <div class="chat-name" id="currentUserName">Gaga_Chat</div>
+            <div class="chat-status">⭐ Премиум</div>
         </div>
-    </section>
+        <button id="logoutBtn" class="menu-btn" style="color:#ff5078;">🚪</button>
+    </div>
+    <div class="chats-list" id="chatsList"></div>
+    <div class="input-bar">
+        <input type="text" id="newChatUser" placeholder="👤 Новый чат">
+        <button id="createChatBtn" class="send-btn" style="background:linear-gradient(135deg, #646cff, #7c5cff);">+</button>
+    </div>
+</div>
 
-    <section class="services">
-        <h2>Что я предлагаю</h2>
-        <div class="cards">
-            <div class="card">
-                <div style="font-size: 48px;">⚡</div>
-                <h3>Скорость</h3>
-                <p>Загрузка до 1 секунды</p>
+<div id="chatScreen" class="hide app-container">
+    <div class="tg-header">
+        <button class="back-btn" id="backToChats">←</button>
+        <div class="avatar" id="chatAvatar">👤</div>
+        <div class="chat-info">
+            <div class="chat-name" id="chatWithName"></div>
+            <div class="chat-status" id="chatStatus">в сети</div>
+        </div>
+        <button id="starInChat" class="menu-btn" style="color:#ffc107;">☆</button>
+    </div>
+    <div class="messages-container" id="messagesContainer"></div>
+    <div class="reply-bar" id="replyBar">
+        <span id="replyText">✏️ Ответ...</span>
+        <button id="cancelReplyBtn">✖</button>
+    </div>
+    <div class="input-bar">
+        <input type="text" id="messageInput" placeholder="Сообщение...">
+        <button id="sendBtn" class="send-btn">📤</button>
+    </div>
+</div>
+
+<div id="messageMenu" class="message-menu">
+    <button id="replyMenuItem">↩️ Ответить</button>
+    <button id="editMenuItem">✏️ Редактировать</button>
+    <button id="deleteMenuItem">🗑️ Удалить</button>
+</div>
+
+<script>
+    let currentUser = null;
+    let currentChatWith = null;
+    let selectedMessage = null;
+    let replyToMessage = null;
+    let editingMessage = null;
+
+    function getUsers() {
+        let users = localStorage.getItem('gaga_users');
+        return users ? JSON.parse(users) : {};
+    }
+    function saveUsers(users) {
+        localStorage.setItem('gaga_users', JSON.stringify(users));
+    }
+    function getMessages(user1, user2) {
+        let key = 'chat_' + [user1, user2].sort().join('_');
+        let msgs = localStorage.getItem(key);
+        return msgs ? JSON.parse(msgs) : [];
+    }
+    function saveMessages(user1, user2, messages) {
+        let key = 'chat_' + [user1, user2].sort().join('_');
+        localStorage.setItem(key, JSON.stringify(messages));
+    }
+    function addMessage(from, to, text, replyTo = null) {
+        let messages = getMessages(from, to);
+        messages.push({
+            id: Date.now() + Math.random(),
+            from: from,
+            text: text,
+            time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+            edited: false,
+            replyTo: replyTo
+        });
+        saveMessages(from, to, messages);
+    }
+    function deleteMessage(from, to, msgId) {
+        let messages = getMessages(from, to);
+        messages = messages.filter(m => m.id != msgId);
+        saveMessages(from, to, messages);
+    }
+    function editMessage(from, to, msgId, newText) {
+        let messages = getMessages(from, to);
+        for (let i = 0; i < messages.length; i++) {
+            if (messages[i].id == msgId && messages[i].from === from) {
+                messages[i].text = newText;
+                messages[i].edited = true;
+                break;
+            }
+        }
+        saveMessages(from, to, messages);
+    }
+    function register(username, password) {
+        let users = getUsers();
+        if (users[username]) return false;
+        let privateChat = '📓 ' + username + ' (личное)';
+        users[username] = {
+            password: btoa(password),
+            chats: [privateChat],
+            favorites: [privateChat]
+        };
+        saveUsers(users);
+        return true;
+    }
+    function login(username, password) {
+        let users = getUsers();
+        if (users[username] && atob(users[username].password) === password) {
+            currentUser = username;
+            let nameElem = document.getElementById('currentUserName');
+            if (nameElem) nameElem.innerText = username;
+            return true;
+        }
+        return false;
+    }
+    function isFavorite(chatName) {
+        let users = getUsers();
+        let favs = users[currentUser]?.favorites || [];
+        return favs.includes(chatName);
+    }
+    function toggleFavorite(chatName) {
+        let users = getUsers();
+        let favs = users[currentUser].favorites || [];
+        if (favs.includes(chatName)) {
+            users[currentUser].favorites = favs.filter(f => f !== chatName);
+        } else {
+            users[currentUser].favorites.push(chatName);
+        }
+        saveUsers(users);
+        renderChats();
+        updateStarInChat();
+    }
+    function createChatWith(otherUser) {
+        if (otherUser === currentUser) return true;
+        let users = getUsers();
+        if (!users[otherUser]) return false;
+        let userData = users[currentUser];
+        if (!userData.chats.includes(otherUser)) {
+            userData.chats.push(otherUser);
+            saveUsers(users);
+        }
+        return true;
+    }
+    function renderChats() {
+        let users = getUsers();
+        let allChats = users[currentUser]?.chats || [];
+        let favorites = users[currentUser]?.favorites || [];
+        let favoriteChats = [];
+        let regularChats = [];
+        for (let i = 0; i < allChats.length; i++) {
+            let chat = allChats[i];
+            if (favorites.includes(chat)) {
+                favoriteChats.push(chat);
+            } else {
+                regularChats.push(chat);
+            }
+        }
+        let container = document.getElementById('chatsList');
+        if (!container) return;
+        container.innerHTML = '';
+        if (favoriteChats.length > 0) {
+            let favTitle = document.createElement('div');
+            favTitle.style.cssText = 'padding: 14px 20px 6px 20px; color:#8e8ea8; font-size:12px; letter-spacing:0.5px;';
+            favTitle.innerText = '⭐ ИЗБРАННОЕ';
+            container.appendChild(favTitle);
+            for (let i = 0; i < favoriteChats.length; i++) {
+                container.appendChild(createChatItem(favoriteChats[i], true));
+            }
+        }
+        if (regularChats.length > 0) {
+            let regTitle = document.createElement('div');
+            regTitle.style.cssText = 'padding: 14px 20px 6px 20px; color:#8e8ea8; font-size:12px; letter-spacing:0.5px;';
+            regTitle.innerText = '💬 ЧАТЫ';
+            container.appendChild(regTitle);
+            for (let i = 0; i < regularChats.length; i++) {
+                container.appendChild(createChatItem(regularChats[i], false));
+            }
+        }
+        if (allChats.length === 0) {
+            container.innerHTML = '<div style="text-align:center;color:#8e8ea8;padding:40px;">Нет чатов</div>';
+        }
+    }
+    function createChatItem(chatName, isFav) {
+        let div = document.createElement('div');
+        div.className = 'chat-item';
+        let isPrivate = chatName.includes('(личное)');
+        let displayName = isPrivate ? currentUser + ' (заметки)' : chatName;
+        let emoji = isPrivate ? '📓' : '👤';
+        div.innerHTML = `
+            <div class="chat-avatar">${emoji}</div>
+            <div class="chat-preview">
+                <h4>${escapeHtml(displayName)}</h4>
+                <p>${isPrivate ? 'Личные заметки' : 'Нажмите для чата'}</p>
             </div>
-            <div class="card">
-                <div style="font-size: 48px;">📱</div>
-                <h3>Адаптивность</h3>
-                <p>Красиво на любом экране</p>
-            </div>
-            <div class="card">
-                <div style="font-size: 48px;">🎨</div>
-                <h3>Стиль</h3>
-                <p>Уникальный современный дизайн</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="pricing">
-        <div class="price-card">
-            <h3>Сайт под ключ</h3>
-            <div class="price">5 000 ₽</div>
-            <p>Лендинг + форма связи + адаптив</p>
-            <p style="margin-top: 20px;">Срок: 1-2 дня</p>
-        </div>
-    </section>
-
-    <section id="form" class="form-section">
-        <div class="form-card">
-            <h2>Оставьте заявку</h2>
-            <form>
-                <input type="text" placeholder="Ваше имя" required>
-                <input type="tel" placeholder="Номер телефона" required>
-                <textarea rows="4" placeholder="Расскажите о проекте"></textarea>
-                <button type="submit">Отправить →</button>
-            </form>
-            <p style="margin-top: 30px; color: #808090;">📱 Telegram: @ваш_логин</p>
-        </div>
-    </section>
-
-    <footer>
-        <p>© 2026 — Студент-программист, Ярославский политех</p>
-        <p style="margin-top: 8px;">Современные сайты для вашего бизнеса</p>
-    </footer>
+            <button class="star-btn" style="background:none;border:none;font-size:22px;color:${isFav ? '#ffc107' : '#555'};cursor:pointer;width:40px;height:40px;border-radius:50%;">${isFav ? '★' : '☆'}</button>
+        `;
+        let preview = div.querySelector('.chat-preview');
+        if (preview) preview.onclick = () => openChat(chatName);
+        let starBtn = div.querySelector('.star-btn');
+        if (starBtn) {
+            starBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(chatName);
+            };
+        }
+        return div;
+    }
+    function escapeHtml(text) {
+        if (!text) return '';
+        let div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    function openChat(withUser) {
+        currentChatWith = withUser;
+        replyToMessage = null;
+        editingMessage = null;
+        let replyBar = document.getElementById('replyBar');
+        if (replyBar) replyBar.style.display = 'none';
+        let isPrivate = withUser.includes('(личное)');
+        let displayName = isPrivate ? currentUser + ' (заметки)' : withUser;
+        let nameElem = document.getElementById('chatWithName');
+        if (nameElem) nameElem.innerText = displayName;
+        let avatarElem = document.getElementById('chatAvatar');
+        if (avatarElem) avatarElem.innerHTML = isPrivate ? '📓' : '👤';
+        let statusElem = document.getElementById('chatStatus');
+        if (statusElem) statusElem.innerText = isPrivate ? 'личные заметки' : 'онлайн';
+        updateStarInChat();
+        renderMessages();
+        let chatsScreen = document.getElementById('chatsScreen');
+        let chatScreen = document.getElementById('chatScreen');
+        if (chatsScreen) chatsScreen.classList.add('hide');
+        if (chatScreen) chatScreen.classList.remove('hide');
+    }
+    function updateStarInChat() {
+        let starBtn = document.getElementById('starInChat');
+        if (!starBtn) return;
+        if (currentChatWith && isFavorite(currentChatWith)) {
+            starBtn.innerHTML = '★';
+            starBtn.style.color = '#ffc107';
+        } else {
+            starBtn.innerHTML = '☆';
+            starBtn.style.color = '#555';
+        }
+    }
+    function showMessageMenu(event, msg) {
+        event.stopPropagation();
+        selectedMessage = msg;
+        let menu = document.getElementById('messageMenu');
+        if (!menu) return;
+        menu.style.display = 'block';
+        let x = event.pageX;
+        let y = event.pageY;
+        if (x + 180 > window.innerWidth) x = window.innerWidth - 190;
+        if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        let closeMenu = function(e) {
+            if (menu && !menu.contains(e.target)) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeMenu);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closeMenu), 10);
+    }
+    function renderMessages() {
+        let messages = getMessages(currentUser, currentChatWith);
+        let container = document.getElementById('messagesContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 0; i < messages.length; i++) {
+            let msg = messages[i];
+            let row = document.createElement('div');
+            let isMe = msg.from === currentUser;
+            row.className = `message-row ${isMe ? 'outgoing' : 'incoming'}`;
+            let bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            let replyHtml = '';
+            if (msg.replyTo) {
+                let repliedMsg = null;
+                for (let j = 0; j < messages.length; j++) {
+                    if (messages[j].id == msg.replyTo) {
+                        repliedMsg = messages[j];
+                        break;
+                    }
+                }
+                if (repliedMsg) {
+                    replyHtml = `<div class="reply-preview">↩️ ${escapeHtml(repliedMsg.from)}: ${escapeHtml(repliedMsg.text.substring(0, 40))}</div>`;
+                }
+            }
+            bubble.innerHTML = replyHtml + `<div class="bubble-text">${escapeHtml(msg.text)}${msg.edited ? '<span class="edited-badge">(ред.)</span>' : ''}</div><div class="bubble-time">${msg.time}</div>`;
+            bubble.onclick = (function(m) {
+                return function(e) {
+                    e.stopPropagation();
+                    showMessageMenu(e, m);
+                };
+            })(msg);
+            row.appendChild(bubble);
+            container.appendChild(row);
+        }
+        if (messages.length === 0 && currentChatWith.includes('(личное)')) {
+            let note = document.createElement('div');
+            note.style.textAlign = 'center';
+            note.style.padding = '40px';
+            note.innerHTML = '<div style="background:rgba(255,193,7,0.1);border-radius:20px;padding:12px 20px;display:inline-block;color:#ffc107;">📝 Ваши личные заметки</div>';
+            container.appendChild(note);
+        }
+        container.scrollTop = container.scrollHeight;
+    }
+    function sendMessage() {
+        let input = document.getElementById('messageInput');
+        if (!input) return;
+        let text = input.value.trim();
+        if (!text) return;
+        if (editingMessage) {
+            editMessage(currentUser, currentChatWith, editingMessage.id, text);
+            editingMessage = null;
+            let replyBar = document.getElementById('replyBar');
+            if (replyBar) replyBar.style.display = 'none';
+        } else {
+            addMessage(currentUser, currentChatWith, text, replyToMessage ? replyToMessage.id : null);
+            replyToMessage = null;
+            let replyBar = document.getElementById('replyBar');
+            if (replyBar) replyBar.style.display = 'none';
+        }
+        renderMessages();
+        input.value = '';
+        input.focus();
+    }
+    function showAuth() {
+        let authScreen = document.getElementById('authScreen');
+        let chatsScreen = document.getElementById('chatsScreen');
+        let chatScreen = document.getElementById('chatScreen');
+        if (authScreen) authScreen.classList.remove('hide');
+        if (chatsScreen) chatsScreen.classList.add('hide');
+        if (chatScreen) chatScreen.classList.add('hide');
+    }
+    function showChats() {
+        renderChats();
+        let authScreen = document.getElementById('authScreen');
+        let chatsScreen = document.getElementById('chatsScreen');
+        let chatScreen = document.getElementById('chatScreen');
+        if (authScreen) authScreen.classList.add('hide');
+        if (chatsScreen) chatsScreen.classList.remove('hide');
+        if (chatScreen) chatScreen.classList.add('hide');
+    }
+    
+    // Обработчики
+    document.getElementById('doLogin').onclick = () => {
+        let user = document.getElementById('loginUsername').value;
+        let pass = document.getElementById('loginPassword').value;
+        if (login(user, pass)) showChats();
+        else alert('Неверно');
+    };
+    document.getElementById('doRegister').onclick = () => {
+        let user = document.getElementById('regUsername').value;
+        let pass = document.getElementById('regPassword').value;
+        if (register(user, pass)) {
+            alert('Успех! Войдите');
+            document.getElementById('toLogin').click();
+        } else alert('Пользователь есть');
+    };
+    document.getElementById('toRegister').onclick = () => {
+        document.getElementById('registerCard').classList.remove('hide');
+        document.querySelector('.auth-card').classList.add('hide');
+    };
+    document.getElementById('toLogin').onclick = () => {
+        document.getElementById('registerCard').classList.add('hide');
+        document.querySelector('.auth-card').classList.remove('hide');
+    };
+    document.getElementById('logoutBtn').onclick = () => { currentUser = null; showAuth(); };
+    document.getElementById('backToChats').onclick = () => showChats();
+    document.getElementById('starInChat').onclick = () => { if (currentChatWith) toggleFavorite(currentChatWith); };
+    document.getElementById('createChatBtn').onclick = () => {
+        let other = document.getElementById('newChatUser').value;
+        if (createChatWith(other)) { renderChats(); document.getElementById('newChatUser').value = ''; }
+        else if (other !== currentUser) alert('Пользователь не найден');
+    };
+    document.getElementById('sendBtn').onclick = sendMessage;
+    document.getElementById('messageInput').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+    document.getElementById('replyMenuItem').onclick = () => {
+        if (selectedMessage) {
+            replyToMessage = selectedMessage;
+            document.getElementById('replyText').innerHTML = `✏️ Ответ ${selectedMessage.from}: ${selectedMessage.text.substring(0, 40)}`;
+            document.getElementById('replyBar').style.display = 'flex';
+            document.getElementById('messageMenu').style.display = 'none';
+        }
+    };
+    document.getElementById('editMenuItem').onclick = () => {
+        if (selectedMessage && selectedMessage.from === currentUser) {
+            editingMessage = selectedMessage;
+            document.getElementById('messageInput').value = selectedMessage.text;
+            document.getElementById('replyBar').style.display = 'flex';
+            document.getElementById('replyText').innerHTML = `✏️ Редактирование`;
+            document.getElementById('messageMenu').style.display = 'none';
+            document.getElementById('messageInput').focus();
+        } else alert('Можно редактировать только свои сообщения');
+    };
+    document.getElementById('deleteMenuItem').onclick = () => {
+        if (selectedMessage && selectedMessage.from === currentUser) {
+            deleteMessage(currentUser, currentChatWith, selectedMessage.id);
+            renderMessages();
+        } else alert('Можно удалять только свои сообщения');
+        document.getElementById('messageMenu').style.display = 'none';
+    };
+    document.getElementById('cancelReplyBtn').onclick = () => {
+        replyToMessage = null;
+        editingMessage = null;
+        document.getElementById('replyBar').style.display = 'none';
+        document.getElementById('messageInput').value = '';
+    };
+    
+    if (!localStorage.getItem('gaga_users')) {
+        register('Alice', '123');
+        register('Bob', '123');
+    }
+    showAuth();
+</script>
 </body>
 </html>
