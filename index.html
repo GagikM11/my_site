@@ -418,39 +418,52 @@
             border-radius: 4px;
         }
 
-        .private-bubble {
-            background: rgba(255,193,7,0.12);
-            border: 0.5px solid rgba(255,193,7,0.3);
-            border-radius: 20px;
-            padding: 8px 16px;
-            display: inline-block;
-            color: #ffc107;
-            font-size: 13px;
-        }
-
-        .private-message {
+        .version-footer {
+            flex-shrink: 0;
             text-align: center;
-            margin: 20px 0;
+            padding: 8px;
+            font-size: 11px;
+            color: #555;
+            border-top: 0.5px solid rgba(255,255,255,0.05);
+            background: #0a0a0f;
         }
 
-        /* Desktop styles */
         @media (min-width: 768px) {
             .app-container {
                 max-width: 500px;
                 margin: 0 auto;
                 box-shadow: 0 0 20px rgba(0,0,0,0.5);
             }
-            
             body {
                 background: #000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
-            
             .bubble {
                 max-width: 70%;
             }
+        }
+        
+        .info-text {
+            text-align: center;
+            color: #8e8e93;
+            font-size: 14px;
+            padding: 20px;
+        }
+        
+        .create-chat-section {
+            background: #1c1c1e;
+            padding: 12px;
+            border-top: 0.5px solid rgba(255,255,255,0.1);
+            border-bottom: 0.5px solid rgba(255,255,255,0.1);
+        }
+        
+        .create-chat-title {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 8px;
+            padding-left: 4px;
         }
     </style>
 </head>
@@ -483,11 +496,15 @@
         <button id="logoutBtn" class="menu-btn" style="color:#ff5078;">🚪</button>
     </div>
     <div class="chats-list" id="chatsList"></div>
-    <div class="input-container">
+    <div class="create-chat-section">
+        <div class="create-chat-title">➕ СОЗДАТЬ НОВЫЙ ЧАТ</div>
         <div class="input-bar">
-            <input type="text" id="newChatUser" placeholder="👤 Имя пользователя для нового чата">
-            <button id="createChatBtn" class="send-btn" style="background:#2b6fde;">+</button>
+            <input type="text" id="newChatUser" placeholder="👤 Введите имя пользователя">
+            <button id="createChatBtn" class="send-btn" style="background:#2b6fde;">➕</button>
         </div>
+    </div>
+    <div class="version-footer">
+        Gaga_Chat v2.0 | Ваш ID: <span id="userIdDisplay"></span>
     </div>
 </div>
 
@@ -511,6 +528,9 @@
             <input type="text" id="messageInput" placeholder="Введите сообщение...">
             <button id="sendBtn" class="send-btn">📤</button>
         </div>
+    </div>
+    <div class="version-footer">
+        Gaga_Chat v2.0 | Чат с <span id="chatWithNameFooter"></span>
     </div>
 </div>
 
@@ -596,6 +616,8 @@
             currentUser = username;
             let nameElem = document.getElementById('currentUserName');
             if (nameElem) nameElem.innerText = username;
+            let userIdElem = document.getElementById('userIdDisplay');
+            if (userIdElem) userIdElem.innerText = username;
             return true;
         }
         return false;
@@ -622,17 +644,39 @@
     
     function createChatWith(otherUser) {
         if (otherUser === currentUser) {
-            alert("Нельзя создать чат с самим собой!");
+            alert("❌ Нельзя создать чат с самим собой!");
             return false;
         }
         let users = getUsers();
-        if (!users[otherUser]) return false;
+        if (!users[otherUser]) {
+            let available = getAvailableUsers();
+            if (available.length > 0) {
+                alert(`❌ Пользователь "${otherUser}" не найден!\nДоступные: ${available.join(", ")}`);
+            } else {
+                alert("❌ Нет других пользователей для чата!");
+            }
+            return false;
+        }
         let userData = users[currentUser];
         if (!userData.chats.includes(otherUser)) {
             userData.chats.push(otherUser);
             saveUsers(users);
+            return true;
+        } else {
+            alert(`i️ Чат с ${otherUser} уже существует!`);
+            return false;
         }
-        return true;
+    }
+    
+    function getAvailableUsers() {
+        let users = getUsers();
+        let available = [];
+        for (let user in users) {
+            if (user !== currentUser) {
+                available.push(user);
+            }
+        }
+        return available;
     }
     
     function renderChats() {
@@ -672,7 +716,18 @@
             }
         }
         if (allChats.length === 0) {
-            container.innerHTML = '<div style="text-align:center;color:#8e8e93;padding:40px;">Нет чатов<br><br>➕ Добавьте пользователя в поле ниже</div>';
+            let emptyDiv = document.createElement('div');
+            emptyDiv.className = 'info-text';
+            emptyDiv.innerHTML = '📭 У вас пока нет чатов<br><br>👇 Создайте новый чат внизу экрана';
+            container.appendChild(emptyDiv);
+        }
+        
+        let available = getAvailableUsers();
+        if (available.length > 0) {
+            let hint = document.createElement('div');
+            hint.style.cssText = 'padding: 12px 16px; color:#555; font-size:12px; text-align:center; border-top:0.5px solid rgba(255,255,255,0.05); margin-top:8px;';
+            hint.innerHTML = `💡 Доступные пользователи: ${available.join(", ")}`;
+            container.appendChild(hint);
         }
     }
     
@@ -715,7 +770,9 @@
         let replyBar = document.getElementById('replyBar');
         if (replyBar) replyBar.style.display = 'none';
         let nameElem = document.getElementById('chatWithName');
+        let nameFooter = document.getElementById('chatWithNameFooter');
         if (nameElem) nameElem.innerText = withUser;
+        if (nameFooter) nameFooter.innerText = withUser;
         let avatarElem = document.getElementById('chatAvatar');
         if (avatarElem) avatarElem.innerHTML = '👤';
         let statusElem = document.getElementById('chatStatus');
@@ -731,7 +788,6 @@
             let input = document.getElementById('messageInput');
             if (input) {
                 input.focus();
-                input.click();
             }
         }, 300);
     }
@@ -812,7 +868,7 @@
         
         if (messages.length === 0) {
             let emptyDiv = document.createElement('div');
-            emptyDiv.style.cssText = 'text-align:center;color:#8e8e93;padding:40px;';
+            emptyDiv.className = 'info-text';
             emptyDiv.innerHTML = '💬 Нет сообщений<br><br>Напишите что-нибудь...';
             container.appendChild(emptyDiv);
         }
@@ -879,187 +935,113 @@
         if (chatScreen) chatScreen.classList.add('hide');
     }
     
-    // Initialize event listeners
-    let loginBtn = document.getElementById('doLogin');
-    if (loginBtn) {
-        loginBtn.onclick = () => {
-            let user = document.getElementById('loginUsername').value.trim();
-            let pass = document.getElementById('loginPassword').value;
-            if (user && pass && login(user, pass)) {
-                showChats();
+    document.getElementById('doLogin').onclick = () => {
+        let user = document.getElementById('loginUsername').value.trim();
+        let pass = document.getElementById('loginPassword').value;
+        if (user && pass && login(user, pass)) {
+            showChats();
+        } else {
+            alert("Неверное имя пользователя или пароль!");
+        }
+    };
+    
+    document.getElementById('doRegister').onclick = () => {
+        let user = document.getElementById('regUsername').value.trim();
+        let pass = document.getElementById('regPassword').value;
+        if (user && pass) {
+            if (register(user, pass)) {
+                alert("Регистрация успешна! Теперь войдите.");
+                document.getElementById('toLogin').click();
             } else {
-                alert("Неверное имя пользователя или пароль!");
+                alert("Пользователь уже существует!");
             }
-        };
-    }
+        } else {
+            alert("Заполните все поля!");
+        }
+    };
     
-    let registerBtn = document.getElementById('doRegister');
-    if (registerBtn) {
-        registerBtn.onclick = () => {
-            let user = document.getElementById('regUsername').value.trim();
-            let pass = document.getElementById('regPassword').value;
-            if (user && pass) {
-                if (register(user, pass)) {
-                    alert("Регистрация успешна! Теперь войдите.");
-                    let toLogin = document.getElementById('toLogin');
-                    if (toLogin) toLogin.click();
-                } else {
-                    alert("Пользователь с таким именем уже существует!");
-                }
+    document.getElementById('toRegister').onclick = () => {
+        document.getElementById('registerCard').classList.remove('hide');
+        document.querySelector('.auth-card').classList.add('hide');
+    };
+    
+    document.getElementById('toLogin').onclick = () => {
+        document.getElementById('registerCard').classList.add('hide');
+        document.querySelector('.auth-card').classList.remove('hide');
+    };
+    
+    document.getElementById('logoutBtn').onclick = () => { currentUser = null; showAuth(); };
+    document.getElementById('backToChats').onclick = () => showChats();
+    document.getElementById('starInChat').onclick = () => { if (currentChatWith) toggleFavorite(currentChatWith); };
+    
+    document.getElementById('createChatBtn').onclick = () => {
+        let other = document.getElementById('newChatUser').value.trim();
+        if (!other) {
+            let available = getAvailableUsers();
+            if (available.length > 0) {
+                alert(`Доступные пользователи: ${available.join(", ")}`);
             } else {
-                alert("Заполните все поля!");
-            }
-        };
-    }
-    
-    let toRegisterBtn = document.getElementById('toRegister');
-    if (toRegisterBtn) {
-        toRegisterBtn.onclick = () => {
-            let registerCard = document.getElementById('registerCard');
-            let authCard = document.querySelector('.auth-card');
-            if (registerCard) registerCard.classList.remove('hide');
-            if (authCard) authCard.classList.add('hide');
-        };
-    }
-    
-    let toLoginBtn = document.getElementById('toLogin');
-    if (toLoginBtn) {
-        toLoginBtn.onclick = () => {
-            let registerCard = document.getElementById('registerCard');
-            let authCard = document.querySelector('.auth-card');
-            if (registerCard) registerCard.classList.add('hide');
-            if (authCard) authCard.classList.remove('hide');
-        };
-    }
-    
-    let logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.onclick = () => { currentUser = null; showAuth(); };
-    }
-    
-    let backBtn = document.getElementById('backToChats');
-    if (backBtn) {
-        backBtn.onclick = () => showChats();
-    }
-    
-    let starChatBtn = document.getElementById('starInChat');
-    if (starChatBtn) {
-        starChatBtn.onclick = () => { if (currentChatWith) toggleFavorite(currentChatWith); };
-    }
-    
-    let createChatBtn = document.getElementById('createChatBtn');
-    if (createChatBtn) {
-        createChatBtn.onclick = () => {
-            let other = document.getElementById('newChatUser').value.trim();
-            if (!other) {
                 alert("Введите имя пользователя!");
-                return;
             }
-            if (createChatWith(other)) { 
-                renderChats(); 
-                let input = document.getElementById('newChatUser');
-                if (input) input.value = '';
-                alert(`Чат с ${other} создан!`);
-            } else {
-                alert(`Пользователь "${other}" не найден!`);
+            return;
+        }
+        if (createChatWith(other)) { 
+            renderChats(); 
+            document.getElementById('newChatUser').value = '';
+            alert(`Чат с ${other} создан!`);
+        }
+    };
+    
+    document.getElementById('sendBtn').onclick = sendMessage;
+    document.getElementById('messageInput').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+    
+    document.getElementById('replyMenuItem').onclick = () => {
+        if (selectedMessage) {
+            replyToMessage = selectedMessage;
+            document.getElementById('replyText').innerHTML = `↩️ Ответ ${selectedMessage.from}: ${selectedMessage.text.substring(0, 40)}`;
+            document.getElementById('replyBar').style.display = 'flex';
+            document.getElementById('messageMenu').style.display = 'none';
+            document.getElementById('messageInput').focus();
+        }
+    };
+    
+    document.getElementById('editMenuItem').onclick = () => {
+        if (selectedMessage && selectedMessage.from === currentUser) {
+            editingMessage = selectedMessage;
+            document.getElementById('messageInput').value = selectedMessage.text;
+            document.getElementById('replyBar').style.display = 'flex';
+            document.getElementById('replyText').innerHTML = `✏️ Редактирование сообщения`;
+            document.getElementById('messageMenu').style.display = 'none';
+            document.getElementById('messageInput').focus();
+        } else {
+            alert("Можно редактировать только свои сообщения!");
+        }
+    };
+    
+    document.getElementById('deleteMenuItem').onclick = () => {
+        if (selectedMessage && selectedMessage.from === currentUser) {
+            if (confirm("Удалить сообщение?")) {
+                deleteMessage(currentUser, currentChatWith, selectedMessage.id);
+                renderMessages();
             }
-        };
-    }
+        } else {
+            alert("Можно удалять только свои сообщения!");
+        }
+        document.getElementById('messageMenu').style.display = 'none';
+    };
     
-    let sendBtn = document.getElementById('sendBtn');
-    if (sendBtn) {
-        sendBtn.onclick = sendMessage;
-    }
+    document.getElementById('cancelReplyBtn').onclick = () => {
+        replyToMessage = null;
+        editingMessage = null;
+        document.getElementById('replyBar').style.display = 'none';
+        document.getElementById('messageInput').value = '';
+        document.getElementById('messageInput').focus();
+    };
     
-    let messageInput = document.getElementById('messageInput');
-    if (messageInput) {
-        messageInput.onkeypress = (e) => { 
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        };
-        messageInput.onclick = (e) => {
-            e.stopPropagation();
-        };
-    }
-    
-    let replyMenuItem = document.getElementById('replyMenuItem');
-    if (replyMenuItem) {
-        replyMenuItem.onclick = () => {
-            if (selectedMessage) {
-                replyToMessage = selectedMessage;
-                let replyText = document.getElementById('replyText');
-                if (replyText) {
-                    replyText.innerHTML = `↩️ Ответ ${selectedMessage.from}: ${selectedMessage.text.substring(0, 40)}`;
-                }
-                let replyBar = document.getElementById('replyBar');
-                if (replyBar) replyBar.style.display = 'flex';
-                let menu = document.getElementById('messageMenu');
-                if (menu) menu.style.display = 'none';
-                let input = document.getElementById('messageInput');
-                if (input) input.focus();
-            }
-        };
-    }
-    
-    let editMenuItem = document.getElementById('editMenuItem');
-    if (editMenuItem) {
-        editMenuItem.onclick = () => {
-            if (selectedMessage && selectedMessage.from === currentUser) {
-                editingMessage = selectedMessage;
-                let input = document.getElementById('messageInput');
-                if (input) input.value = selectedMessage.text;
-                let replyBar = document.getElementById('replyBar');
-                if (replyBar) {
-                    replyBar.style.display = 'flex';
-                    let replyText = document.getElementById('replyText');
-                    if (replyText) replyText.innerHTML = `✏️ Редактирование сообщения`;
-                }
-                let menu = document.getElementById('messageMenu');
-                if (menu) menu.style.display = 'none';
-                if (input) input.focus();
-            } else {
-                alert("Можно редактировать только свои сообщения!");
-            }
-        };
-    }
-    
-    let deleteMenuItem = document.getElementById('deleteMenuItem');
-    if (deleteMenuItem) {
-        deleteMenuItem.onclick = () => {
-            if (selectedMessage && selectedMessage.from === currentUser) {
-                if (confirm("Удалить сообщение?")) {
-                    deleteMessage(currentUser, currentChatWith, selectedMessage.id);
-                    renderMessages();
-                }
-            } else {
-                alert("Можно удалять только свои сообщения!");
-            }
-            let menu = document.getElementById('messageMenu');
-            if (menu) menu.style.display = 'none';
-        };
-    }
-    
-    let cancelReplyBtn = document.getElementById('cancelReplyBtn');
-    if (cancelReplyBtn) {
-        cancelReplyBtn.onclick = () => {
-            replyToMessage = null;
-            editingMessage = null;
-            let replyBar = document.getElementById('replyBar');
-            if (replyBar) replyBar.style.display = 'none';
-            let input = document.getElementById('messageInput');
-            if (input) input.value = '';
-            if (input) input.focus();
-        };
-    }
-    
-    // Initialize test users
     if (!localStorage.getItem('gaga_users')) {
         register('Alice', '123');
         register('Bob', '123');
         register('Charlie', '123');
-        console.log("Test users created: Alice, Bob, Charlie (password: 123)");
     }
     showAuth();
 </script>
