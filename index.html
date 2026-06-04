@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GagaChat</title>
+    <style>
+        :root { --tg-blue: #242f3d; --tg-bg: #0e1621; --tg-sent: #2b5278; }
+        body { margin: 0; font-family: sans-serif; background-color: var(--tg-bg); background-image: url('https://i.pinimg.com'); background-size: cover; background-attachment: fixed; display: flex; flex-direction: column; height: 100dvh; color: white; }
+        header { background: var(--tg-blue); padding: 10px 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .avatar { width: 40px; height: 40px; background: #5085b1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+        .message-bubble { max-width: 85%; padding: 8px 12px; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.3); font-size: 16px; word-wrap: break-word; }
+        .my { align-self: flex-end; background: var(--tg-sent); border-bottom-right-radius: 4px; }
+        .other { align-self: flex-start; background: #182533; border-bottom-left-radius: 4px; }
+        .msg-nick { font-weight: bold; font-size: 13px; color: #64b5f6; margin-bottom: 2px; }
+        .msg-time { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; margin-top: 4px; }
+        .footer { background: var(--tg-blue); padding: 10px; display: flex; gap: 10px; align-items: center; }
+        .input-wrapper { background: #17212b; border-radius: 22px; flex: 1; padding: 0 15px; border: 1px solid #2f3942; }
+        input { background: transparent; border: none; color: white; padding: 12px 0; font-size: 16px; outline: none; width: 100%; }
+        .send-btn { background: #5085b1; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .logout { color: #ff6b6b; text-decoration: none; font-size: 14px; margin-left: auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="avatar">{{ username[0] | upper }}</div>
+        <div>
+            <div style="font-weight: bold;">GagaChat Global</div>
+            <div style="font-size: 12px; color: #8193a8;">Вы: {{ username }}</div>
+        </div>
+        <a href="/api/logout" class="logout">Выйти</a>
+    </header>
+
+    <div id="chat"></div>
+
+    <div class="footer">
+        <div class="input-wrapper">
+            <input type="text" id="message-input" placeholder="Сообщение" autocomplete="off">
+        </div>
+        <button class="send-btn" onclick="send()">➤</button>
+    </div>
+
+    <script>
+        const MY_NICK = "{{ username }}";
+        let lastCount = 0;
+        const chatDiv = document.getElementById('chat');
+
+        async function load() {
+            try {
+                const res = await fetch('/get');
+                const data = await res.json();
+                if (data.length > lastCount) {
+                    data.slice(lastCount).forEach(m => {
+                        const isMy = m.nickname === MY_NICK;
+                        const div = document.createElement('div');
+                        div.className = `message-bubble ${isMy ? 'my' : 'other'}`;
+                        div.innerHTML = `<div class="msg-nick">${m.nickname}</div>${m.message}<div class="msg-time">${m.time}</div>`;
+                        chatDiv.appendChild(div);
+                    });
+                    lastCount = data.length;
+                    chatDiv.scrollTop = chatDiv.scrollHeight;
+                }
+            } catch (e) {}
+        }
+
+        async function send() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            await fetch('/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: text, 
+                    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+                })
+            });
+            input.value = '';
+            load();
+        }
+
+        document.getElementById('message-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') send(); });
+        setInterval(load, 2000);
+        load();
+    </script>
+</body>
+</html>
